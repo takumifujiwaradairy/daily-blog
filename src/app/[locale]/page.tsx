@@ -6,16 +6,14 @@ export default function Home({ params }: { params: { locale: string } }) {
   const locale = params.locale as Locale;
   const posts = getAllPosts(locale);
   return (
-    <div className="space-y-6">
+    <div>
       {posts.map((post) => (
-        <article key={post.slug} className="border-b border-neutral-800 pb-6">
-          <Link href={`/${locale}/posts/${post.slug}`} className="group">
-            <time className="text-sm text-neutral-500">{post.date}</time>
-            <h2 className="text-xl font-semibold mt-1 group-hover:text-blue-400 transition-colors">
-              {post.title}
-            </h2>
-            <p className="text-neutral-400 mt-2 text-sm">{post.summary}</p>
-          </Link>
+        <article key={post.slug}>
+          <time>{post.date}</time>
+          <h2>
+            <Link href={`/${locale}/posts/${post.slug}`}>{post.title}</Link>
+          </h2>
+          <p className="summary">{post.summary}</p>
         </article>
       ))}
     </div>

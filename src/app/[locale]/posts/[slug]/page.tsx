@@ -19,10 +19,10 @@ export default async function PostPage({
     const post = await getPost(locale, params.slug);
     return (
       <article>
-        <time className="text-sm text-neutral-500">{post.date}</time>
-        <h1 className="text-2xl font-bold mt-2 mb-6">{post.title}</h1>
+        <time>{post.date}</time>
+        <h1 className="post-title">{post.title}</h1>
         <div
-          className="prose prose-invert prose-neutral max-w-none"
+          className="post-body"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
       </article>
