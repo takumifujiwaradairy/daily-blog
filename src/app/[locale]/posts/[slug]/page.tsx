@@ -1,17 +1,22 @@
 import { getPost, getAllSlugs } from "@/lib/posts";
+import type { Locale } from "@/lib/posts";
+import { locales } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 
 export function generateStaticParams() {
-  return getAllSlugs().map((slug) => ({ slug }));
+  return locales.flatMap((locale) =>
+    getAllSlugs(locale).map((slug) => ({ locale, slug }))
+  );
 }
 
 export default async function PostPage({
   params,
 }: {
-  params: { slug: string };
+  params: { locale: string; slug: string };
 }) {
+  const locale = params.locale as Locale;
   try {
-    const post = await getPost(params.slug);
+    const post = await getPost(locale, params.slug);
     return (
       <article>
         <time className="text-sm text-neutral-500">{post.date}</time>

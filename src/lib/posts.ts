@@ -4,7 +4,7 @@ import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
 
-const postsDirectory = path.join(process.cwd(), "posts");
+export type Locale = "ja" | "en";
 
 export type Post = {
   slug: string;
@@ -14,18 +14,22 @@ export type Post = {
   contentHtml: string;
 };
 
-export function getAllSlugs(): string[] {
+function postsDir(locale: Locale) {
+  return path.join(process.cwd(), "posts", locale);
+}
+
+export function getAllSlugs(locale: Locale): string[] {
   return fs
-    .readdirSync(postsDirectory)
+    .readdirSync(postsDir(locale))
     .filter((f) => f.endsWith(".md"))
     .map((f) => f.replace(/\.md$/, ""));
 }
 
-export function getAllPosts(): Omit<Post, "contentHtml">[] {
-  return getAllSlugs()
+export function getAllPosts(locale: Locale): Omit<Post, "contentHtml">[] {
+  return getAllSlugs(locale)
     .map((slug) => {
       const { data } = matter(
-        fs.readFileSync(path.join(postsDirectory, `${slug}.md`), "utf8")
+        fs.readFileSync(path.join(postsDir(locale), `${slug}.md`), "utf8")
       );
       return {
         slug,
@@ -37,9 +41,9 @@ export function getAllPosts(): Omit<Post, "contentHtml">[] {
     .sort((a, b) => (a.date > b.date ? -1 : 1));
 }
 
-export async function getPost(slug: string): Promise<Post> {
+export async function getPost(locale: Locale, slug: string): Promise<Post> {
   const raw = fs.readFileSync(
-    path.join(postsDirectory, `${slug}.md`),
+    path.join(postsDir(locale), `${slug}.md`),
     "utf8"
   );
   const { data, content } = matter(raw);
