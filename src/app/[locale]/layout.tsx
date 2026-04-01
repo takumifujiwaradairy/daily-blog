@@ -8,12 +8,13 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { locale: string };
-}): Metadata {
-  const locale = params.locale as Locale;
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: loc } = await params;
+  const locale = loc as Locale;
   const i = t(locale);
   return {
     title: i.siteTitle,
@@ -21,14 +22,15 @@ export function generateMetadata({
   };
 }
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const locale = params.locale as Locale;
+  const { locale: loc } = await params;
+  const locale = loc as Locale;
   const i = t(locale);
   return (
     <html lang={locale}>

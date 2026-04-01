@@ -2,8 +2,9 @@ import Link from "next/link";
 import { getAllPosts } from "@/lib/posts";
 import type { Locale } from "@/lib/posts";
 
-export default function Home({ params }: { params: { locale: string } }) {
-  const locale = params.locale as Locale;
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale: loc } = await params;
+  const locale = loc as Locale;
   const posts = getAllPosts(locale);
   return (
     <div>

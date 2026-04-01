@@ -12,11 +12,12 @@ export function generateStaticParams() {
 export default async function PostPage({
   params,
 }: {
-  params: { locale: string; slug: string };
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const locale = params.locale as Locale;
+  const { locale: loc, slug } = await params;
+  const locale = loc as Locale;
   try {
-    const post = await getPost(locale, params.slug);
+    const post = await getPost(locale, slug);
     return (
       <article>
         <time>{post.date}</time>
