@@ -12,7 +12,7 @@ As of August 2026
 
 # Summary
 
-- Client project work, leading a cross-company team of 20+ engineers, fully remote contract work from Southeast Asia, and then joining a startup as its first employee
+- Client project work, leading a cross-company team, fully remote contract work from Southeast Asia, and then joining a startup as its first employee
 - Mainly Ruby on Rails, React and Next.js, owning everything from requirements to design, implementation and operation
 - Experience through to hiring engineers, onboarding them and building a team
 
