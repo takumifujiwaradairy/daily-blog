@@ -48,6 +48,18 @@ jobs:
           fi
           echo "検査通過"
 
+      # CommonMark では句点の直後の「**」が閉じ記号にならないため、
+      # 日本語で「〜です。**」と書くとアスタリスクが生のまま表示される。
+      # 見た目が壊れるだけで型検査もビルドも通ってしまうので、
+      # 生成後のHTMLを見て落とす。
+      - name: 記法の崩れが残っていないか検査
+        run: |
+          if grep -rIl --include='*.html' -e '\*\*' out/ ; then
+            echo "::error::Markdownの強調が閉じていない箇所があります（句点を強調の外に出す）"
+            exit 1
+          fi
+          echo "検査通過"
+
       - name: Cloudflare へデプロイ
         run: npx wrangler deploy
         env:
