@@ -2,6 +2,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "daily-blog",
   "compatibility_date": "2026-08-14",
+  // *.workers.dev のURLを有効化する（動作確認用）。
+  // 独自ドメイン接続後は false にして、入口をドメイン1本に絞る。
+  "workers_dev": true,
   "assets": {
     // next build が output: "export" で吐く静的ファイル群
     "directory": "./out",
