@@ -37,10 +37,13 @@ jobs:
           rm -rf out .next
           npm run build
 
-      - name: 公開してはいけない語が混入していないか検査
+      # 取引先の固有名詞だけを止める。自社（Yourtory）は職歴として
+      # 意図的に公開しているので対象外。ここを広げすぎると
+      # 正当な公開まで落ちて、ガード自体が無効化される方向に働く。
+      - name: 取引先の固有名詞が混入していないか検査
         run: |
-          if grep -rIlEi 'Fintory|Yourtory' out/ ; then
-            echo "::error::公開禁止の固有名詞が生成物に含まれています"
+          if grep -rIlEi 'Fintory' out/ ; then
+            echo "::error::取引先の固有名詞が生成物に含まれています"
             exit 1
           fi
           echo "検査通過"

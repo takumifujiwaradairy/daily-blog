@@ -32,6 +32,17 @@ header a.site-title {
   font-weight: bold;
 }
 
+header nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+header nav a {
+  font-size: 0.8rem;
+  color: #666;
+}
+
 header a.lang-switch {
   font-size: 0.8rem;
   color: #999;
@@ -89,4 +100,44 @@ article p.summary {
   font-size: 1rem;
   font-weight: bold;
   margin-top: 1.5rem;
+}
+
+/* プロフィールは階層が4段まであるため、見出しの深さを
+   文字サイズではなく余白と色で表す。文字サイズを段ごとに
+   変えると、狭い横幅では差が読み取れなくなる。 */
+.cv h2 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 2.5rem 0 0.8rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #eee;
+}
+
+.cv h3 {
+  font-size: 0.95rem;
+  font-weight: bold;
+  margin: 1.8rem 0 0.4rem;
+}
+
+.cv h4 {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #666;
+  margin: 1.2rem 0 0.3rem;
+}
+
+.cv p {
+  margin: 0.4rem 0;
+}
+
+.cv ul {
+  margin: 0.4rem 0;
+}
+
+.cv li {
+  margin-bottom: 0.35rem;
+}
+
+.cv a {
+  text-decoration: underline;
 }

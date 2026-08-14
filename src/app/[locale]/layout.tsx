@@ -39,9 +39,12 @@ export default async function LocaleLayout({
           <Link href={`/${locale}`} className="site-title">
             {i.siteTitle}
           </Link>
-          <Link href={`/${i.langSwitchTo}`} className="lang-switch">
-            {i.langSwitch}
-          </Link>
+          <nav>
+            <Link href={`/${locale}/cv`}>{i.profile}</Link>
+            <Link href={`/${i.langSwitchTo}`} className="lang-switch">
+              {i.langSwitch}
+            </Link>
+          </nav>
         </header>
         {children}
       </body>

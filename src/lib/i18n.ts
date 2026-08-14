@@ -7,12 +7,14 @@ const dict = {
   ja: {
     siteTitle: "Takumi's Daily Log",
     siteDescription: "日々の学びと作業ログ",
+    profile: "プロフィール",
     langSwitch: "EN",
     langSwitchTo: "en" as Locale,
   },
   en: {
     siteTitle: "Takumi's Daily Log",
     siteDescription: "Daily learnings and work log",
+    profile: "Profile",
     langSwitch: "JA",
     langSwitchTo: "ja" as Locale,
   },
