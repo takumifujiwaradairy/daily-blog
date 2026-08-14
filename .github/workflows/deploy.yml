@@ -1,0 +1,52 @@
+name: Deploy
+
+# main への push だけを公開のトリガーにする。
+# ローカルから wrangler deploy を叩くと「コミットしていないファイル」まで
+# 公開されるため（実際に一度事故を起こしている）、公開の判断基準を
+# 手元のファイルシステムではなく git の履歴に一本化する。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 連続 push で古いビルドが後から上書きするのを防ぐ。
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # out/ に前回の生成物が残っていると、削除したはずの記事が
+      # 復活して配信される。CI は毎回まっさらだが、意図を明示しておく。
+      - name: 静的サイトを生成
+        run: |
+          rm -rf out .next
+          npm run build
+
+      - name: 公開してはいけない語が混入していないか検査
+        run: |
+          if grep -rIlEi 'Fintory|Yourtory' out/ ; then
+            echo "::error::公開禁止の固有名詞が生成物に含まれています"
+            exit 1
+          fi
+          echo "検査通過"
+
+      - name: Cloudflare へデプロイ
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
