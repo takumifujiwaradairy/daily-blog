@@ -20,9 +20,9 @@ As of August 2026
 
 ## Skills
 
-- Ruby / Ruby on Rails - around 4 years on projects
+- Ruby / Ruby on Rails - around 5 years on projects
 - React / Next.js - around 3 years on projects
-- TypeScript / JavaScript - around 4 years on projects
+- TypeScript / JavaScript - around 5 years on projects
 - Vue.js / Nuxt.js - around 2 years on projects
 - Go - around 1 year on projects
 - AWS / Vercel / Cloudflare / Firebase
