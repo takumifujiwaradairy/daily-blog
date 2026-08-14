@@ -20,9 +20,9 @@ As of August 2026
 
 ## Skills
 
-- Ruby / Ruby on Rails - around 5 years on projects
+- Ruby / Ruby on Rails - around 5 years ( started self-taught in 2020, around 4 of those at work )
 - React / Next.js - around 3 years on projects
-- TypeScript / JavaScript - around 5 years on projects
+- TypeScript / JavaScript - around 5 years ( started self-taught in 2020, around 4 of those at work )
 - Vue.js / Nuxt.js - around 2 years on projects
 - Go - around 1 year on projects
 - AWS / Vercel / Cloudflare / Firebase
@@ -185,6 +185,7 @@ Apr 2017 - Mar 2021 ( Tokyo )
 
 - I was drawn to behavioural economics.
 - My seminar was run by the novelist Shu Fujisawa. Literature is about describing people, and the interest in people that drives me now started there.
+- **In my final year (2020) I enrolled in a programming school and started teaching myself Ruby on Rails and JavaScript.** That is where the move from economics to engineering began.
 
 # Currently
 
