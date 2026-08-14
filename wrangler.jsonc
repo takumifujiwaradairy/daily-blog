@@ -2,9 +2,17 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "daily-blog",
   "compatibility_date": "2026-08-14",
-  // *.workers.dev のURLを有効化する（動作確認用）。
-  // 独自ドメイン接続後は false にして、入口をドメイン1本に絞る。
-  "workers_dev": true,
+  // 独自ドメインが通ったので workers.dev の入口は閉じる。
+  // 同じ内容が2つのURLで見えると重複コンテンツになり、
+  // 意図しないURLが検索に載る事故の面も残るため。
+  "workers_dev": false,
+  "preview_urls": false,
+  // 本番の入口。custom_domain: true にすると
+  // DNSレコードと証明書の発行までwranglerが面倒を見る。
+  "routes": [
+    { "pattern": "takumifujiwara.com", "custom_domain": true },
+    { "pattern": "www.takumifujiwara.com", "custom_domain": true }
+  ],
   "assets": {
     // next build が output: "export" で吐く静的ファイル群
     "directory": "./out",
