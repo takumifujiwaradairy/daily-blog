@@ -187,9 +187,10 @@ Apr 2017 - Mar 2021 ( Tokyo )
 
 # Currently
 
-- Moving into **AI security and offensive security**, the intersection of building software and breaking it.
-- I write up what I find and what I build on this site.
-- Continuing to study English for IELTS.
+- **Working towards an engineering job in Australia.** As the groundwork for that, I am completing the 88 days of specified work required for a second-year visa, doing casual work in the meantime.
+- **Studying English** alongside it, and preparing for IELTS.
+- Going forward I want to **specialise in security** — particularly AI security and offensive security. The intersection of building software and breaking it.
+- I write up what I build and what I find on this site.
 
 # Links
 
