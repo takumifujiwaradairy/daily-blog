@@ -1,0 +1,5 @@
+# Cloudflare の静的アセット配信が解釈するリダイレクト定義。
+# ルートは日本語版へ送る（旧 src/app/page.tsx の redirect("/ja") の置き換え）。
+# 静的エクスポートでは next/navigation の redirect() が使えないため、
+# 「どこで解決するか」をアプリ層からホスティング層へ移した。
+/    /ja/    302

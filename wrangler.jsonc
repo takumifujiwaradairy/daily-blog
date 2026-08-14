@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "daily-blog",
+  "compatibility_date": "2026-08-14",
+  "assets": {
+    // next build が output: "export" で吐く静的ファイル群
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  }
+}
