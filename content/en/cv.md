@@ -47,7 +47,7 @@ Tools
 
 From 2026
 
-- Joined a startup as its first employee and built the product and the engineering function from nothing.
+- Joined a startup as its first employee and **built the engineering function from nothing**. The product itself had been started by outside contractors, and I took it over from there.
 - Hired and onboarded two engineers, growing the team to four ( one from the UK, three from Japan ).
 - Owned technology strategy, architecture and delivery while still writing code myself.
 - Also ran recruitment, supported sales and helped with bookkeeping. In a small company the engineer has to do all of it.
@@ -109,7 +109,8 @@ Most recent first
 Mar 2026 - Jul 2026 ( Okinawa / Remote )
 
 - Joined a startup connecting business owners with executive-level support as its **first employee**.
-- Built the product and the engineering function from nothing.
+- **Built the engineering function from nothing**, starting as the only in-house engineer.
+- The product had already been started by outside contractors. I took it over and drove development from there.
 - Hired and onboarded two engineers, growing the team to four.
 - Shipped the platform and its monetisation layer to production.
 - Left as the company entered its VC round, returning all equity.
