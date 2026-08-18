@@ -106,7 +106,7 @@ Most recent first
 
 ## Co-Founder & CTO — Yourtory Inc.
 
-Mar 2026 - Jul 2026 ( Okinawa / Remote )
+Mar 2026 - Jul 2026 ( Okinawa / Remote ) · 3 developers
 
 - Joined a startup connecting business owners with executive-level support as its **first employee**.
 - **Built the engineering function from nothing**, starting as the only in-house engineer.
@@ -116,66 +116,130 @@ Mar 2026 - Jul 2026 ( Okinawa / Remote )
 - Left as the company entered its VC round, returning all equity.
 - **The commercial side did not work.** We shipped monetisation and it did not generate revenue. That is the thing I am now most interested in getting right.
 
-### Technologies and responsibilities
+### Matching platform for business owners and executive talent
 
-- React / Hono / Vercel
-- Technology strategy, architecture, technology selection
+Led the productisation of a service aimed at successors of small businesses and startup founders.
+
+- Technology strategy, architecture design, technology selection
 - Engineer hiring, onboarding, 1on1s
-- Recruitment, sales support, bookkeeping support
+- Recruitment marketing, sales support, bookkeeping support
+- Phases: requirements, high-level design, detailed design, implementation, testing, operations
+
+*React / Hono / Vercel*
 
 ## Freelance Software Engineer
 
 Jan 2024 - Mar 2026 ( Remote: Malaysia, the Philippines, Thailand, Japan )
 
-- Delivered client projects for Japanese companies while living in Southeast Asia and studying English.
-- Built a job-matching platform for the food service industry.
-- Cut page load time from **5s to 2.5s**.
-- Integrated Salesforce and consolidated customer data across multiple platforms.
-- Mentored junior developers and ran code reviews.
-- Received a full-time offer from a client, which I declined in order to pursue an international career.
+Delivered client projects for Japanese companies while living in Southeast Asia and studying English.
 
-### Technologies and responsibilities
+### Job-matching platform for the food service industry
 
-- Ruby on Rails / React / AWS / Salesforce API
-- Performance optimisation
-- Code review, mentoring
+8 developers
+
+A product already in its operations and growth phase. I ran discovery with the product owner and owned design, implementation and operation.
+
+- Cut load time on the most-used screen from **5s to 2.5s**.
+- Added mobile support, which the product had been missing.
+- Owned the **consolidation of customer data spread across Salesforce and several other platforms**. External integrations became my main area in the second half.
+- Mentored interns and reviewed code from junior and overseas engineers.
+- Was offered a full-time role leading the product management side, which I declined in order to pursue an international career.
+- Phases: requirements, high-level design, detailed design, implementation, testing, operations
+
+*React / Ruby on Rails / AWS / Salesforce API*
 
 ## Software Engineer → Development Lead — Tandems Inc.
 
 Jan 2022 - Feb 2024 ( Tokyo / Remote )
 
-- Led a cross-company development team of **20+ engineers**.
-- Owned the full project lifecycle from requirements through sprint planning to delivery.
-- Ran client negotiation and coordination between stakeholders.
-- Stepped in as acting project manager during leadership transitions.
+Joined after an internship. Mostly client project work, moving into a development lead role partway through.
 
-### Selected projects
+### Management support tool (development lead)
 
-- **Real-time collaborative editing with WebRTC**
-- Outlook / Teams integration for enterprise clients
-- M&A matching platform with an email campaign system
-- Stock valuation app rebuild ( Next.js / Go / Firestore )
+From Oct 2023 · **20+ developers**
 
-### Technologies and responsibilities
+Assigned to migrate the product to Vue 3, but when the decision was made to rebuild it, I took over as **lead of the new development team**.
 
-- Ruby on Rails / Vue.js / React / Next.js / Go
-- AWS / Firebase
-- WebRTC
-- Requirements definition, technology selection, architecture design
+- Managed **developers across multiple companies** and handled client negotiation.
+- Owned specification cleanup, team planning, spec review and PR review, while still designing and implementing.
+- Built a **real-time collaborative note editor using WebRTC**.
+- Built Outlook calendar integration and a **Teams app** for notifications.
+- Implemented permission management for multiple user roles, and email notifications.
+- Phases: requirements, high-level design, detailed design, implementation, testing, operations
+
+*Vue.js ( Nuxt.js ) / Ruby on Rails / AWS / WebRTC*
+
+### Web app for automated share valuation
+
+Jun 2023 - Sep 2023 · 5 people
+
+A rebuild of a stock valuation web app, **joined from the requirements stage**.
+
+- Ran regular development meetings adapted to a non-technical client.
+- Built the admin screens and owned frontend tasks.
+- On the API side, built CRUD around file uploads to Cloud Storage.
+- Phases: requirements, high-level design, detailed design, implementation, testing
+
+*React ( Next.js ) / Go / Google Firestore*
+
+### M&A matching platform, new feature
+
+Feb 2023 - May 2023 · **20+ developers**
+
+An email campaign feature, owned from design onwards.
+
+- Worked through the design with the client company's own engineers.
+- Phases: high-level design, detailed design, implementation, testing
+
+*Vue.js ( Nuxt.js ) / Ruby on Rails / AWS*
+
+### Book community app
+
+Nov 2022 - Jan 2023 · 5 people
+
+Design and development of a community app.
+
+- Built the part that **identifies and categorises books from their ISBN**.
+- Phases: requirements, high-level design, detailed design, implementation, testing
+
+*Vue.js ( Nuxt.js ) / Flutter / AWS*
+
+### Ordering system for sheet metal fabricators
+
+Apr 2022 - Oct 2022 · 10 people
+
+Built an ordering system.
+
+- Owned the **payment system built on Stripe**.
+- Supported the overseas backend team through the regular development meetings.
+- Acted as **assistant project manager** when the PM changed.
+- Phases: detailed design, implementation, testing
+
+*Vue.js ( Nuxt.js )*
+
+### Beauty platform maintenance
+
+Jan 2022 - Mar 2022 · 5 people
+
+Already in operation, so my work was small changes and testing.
+
+*Vue.js ( Nuxt.js ) / Ruby on Rails / AWS*
 
 ## Software Engineer — Fuji Soft Incorporated
 
 Apr 2021 - Dec 2021 ( Yokohama / On-site )
 
-- Managed testing operations for a large-scale beauty platform.
-- Coordinated cross-company test execution schedules.
-- Wrote test specifications and shell automation.
-- Designed production migration procedures.
+### Test operations for a large-scale beauty platform
 
-### Technologies and responsibilities
+**100+ people**
 
-- Linux ( Red Hat ) / Java / C / Symfoware Server
-- Test design, shell automation
+- Managed operations for unit and integration testing.
+- Ran **test execution across several companies at once**. Reported schedule progress in a daily standup and triggered events to fit other companies' test runs, coordinating across organisational boundaries.
+- Wrote new test specifications, built test tooling (shell scripts for memory expansion and similar), and produced load-test data.
+- **Designed the migration procedure** for tests involving cutover to production.
+- Phases: detailed design, testing, operations
+
+*Linux ( Red Hat ) / Symfoware Server / Java / C*
 
 # Education
 
