@@ -253,9 +253,9 @@ Apr 2017 - Mar 2021 ( Tokyo )
 
 # Currently
 
-- **Working towards an engineering job in Australia.** As the groundwork for that, I am completing the 88 days of specified work required for a second-year visa, doing casual work in the meantime.
-- **Studying English** alongside it, and preparing for IELTS.
+- I am currently **based in Australia**, focusing on **English** (IELTS in progress) and on **studying security**.
 - Going forward I want to **specialise in security** — particularly AI security and offensive security. The intersection of building software and breaking it.
+- Next, I am looking for **somewhere I can settle in and work for the long term**.
 - I write up what I build and what I find on this site.
 
 # Links
