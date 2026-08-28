@@ -20,16 +20,18 @@ As of August 2026
 
 ## Skills
 
-- Ruby / Ruby on Rails - around 5 years ( started self-taught in 2020, around 4 of those at work )
+- Ruby / Ruby on Rails - around 5 years ( started self-taught in 2020 )
 - React / Next.js - around 3 years on projects
-- TypeScript / JavaScript - around 5 years ( started self-taught in 2020, around 4 of those at work )
+- TypeScript / JavaScript - around 5 years ( started self-taught in 2020 )
 - Vue.js / Nuxt.js - around 2 years on projects
 - Go - around 1 year on projects
+- Hono
 - AWS / Vercel / Cloudflare / Firebase
 - Requirements definition / database design / technology selection / application design
 - Linux / Docker / shell scripting ( used on every project, so years omitted )
 - WebRTC ( real-time collaborative editing )
 - Salesforce API integration
+- Stripe API integration
 
 Tools
 
