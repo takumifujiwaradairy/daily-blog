@@ -20,9 +20,9 @@ summary: "フルスタックエンジニア。スタートアップの1人目社
 
 ## スキル、経験
 
-- Ruby / Ruby on Rails - 5年程度 ( 2020年に独学で開始 )
+- Ruby / Ruby on Rails - 5年程度
 - React / Next.js - プロジェクトで3年程度
-- TypeScript / JavaScript - 5年程度 ( 2020年に独学で開始 )
+- TypeScript / JavaScript - 5年程度
 - Vue.js / Nuxt.js - プロジェクトで2年程度
 - Go - プロジェクトで1年程度
 - Hono

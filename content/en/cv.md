@@ -20,9 +20,9 @@ As of August 2026
 
 ## Skills
 
-- Ruby / Ruby on Rails - around 5 years ( started self-taught in 2020 )
+- Ruby / Ruby on Rails - around 5 years
 - React / Next.js - around 3 years on projects
-- TypeScript / JavaScript - around 5 years ( started self-taught in 2020 )
+- TypeScript / JavaScript - around 5 years
 - Vue.js / Nuxt.js - around 2 years on projects
 - Go - around 1 year on projects
 - Hono
