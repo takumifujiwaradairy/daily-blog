@@ -207,7 +207,7 @@ Design and development of a community app.
 
 ### Ordering system for sheet metal fabricators
 
-Apr 2022 - Oct 2022 · 10 people
+Apr 2022 - Oct 2022 · 5 people
 
 Built an ordering system.
 
@@ -230,7 +230,7 @@ Already in operation, so my work was small changes and testing.
 
 Apr 2021 - Dec 2021 ( Yokohama / On-site )
 
-### Test operations for a large-scale beauty platform
+### Test operations for a large-scale horse racing platform
 
 **100+ people**
 
