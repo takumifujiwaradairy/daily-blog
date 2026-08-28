@@ -12,7 +12,7 @@ As of August 2026
 
 # Summary
 
-- Client project work, leading a cross-company team, fully remote contract work, and then joining a startup as its first employee
+- Client project work, leading a development team on a cross-company project, fully remote contract work, and then joining a startup as its first employee
 - Mainly Ruby on Rails, React and Next.js, owning everything from requirements to design, implementation and operation
 - Experience through to hiring engineers, onboarding them and building a team
 
@@ -57,12 +57,11 @@ From 2026
 
 ## As development lead
 
-From 2022, around three years
+Oct 2023 - Feb 2025
 
-- Led a cross-company development team of 20+ engineers.
-- Owned the full project lifecycle: requirements, sprint planning, delivery.
+- **Led the new development team** on a cross-company project with 20+ developers.
+- Ran planning, specification work, spec review and PR review for my team, while still designing and implementing.
 - Ran client negotiation and coordination between stakeholders.
-- Stepped in as acting project manager during leadership transitions.
 
 # What kind of engineer I am
 
