@@ -12,7 +12,7 @@ As of August 2026
 
 # Summary
 
-- Client project work, leading a cross-company team, fully remote contract work from Southeast Asia, and then joining a startup as its first employee
+- Client project work, leading a cross-company team, fully remote contract work, and then joining a startup as its first employee
 - Mainly Ruby on Rails, React and Next.js, owning everything from requirements to design, implementation and operation
 - Experience through to hiring engineers, onboarding them and building a team
 
@@ -55,7 +55,7 @@ From 2026
 
 ## As development lead
 
-From 2022, around two years
+From 2022, around three years
 
 - Led a cross-company development team of 20+ engineers.
 - Owned the full project lifecycle: requirements, sprint planning, delivery.
@@ -129,9 +129,9 @@ Led the productisation of a service aimed at successors of small businesses and 
 
 ## Freelance Software Engineer
 
-Jan 2024 - Mar 2026 ( Remote: Malaysia, the Philippines, Thailand, Japan )
+Jan 2025 - May 2026 ( Fully remote )
 
-Delivered client projects for Japanese companies while living in Southeast Asia and studying English.
+Delivered client projects for Japanese companies while continuing to study English.
 
 ### Job-matching platform for the food service industry
 
@@ -150,13 +150,13 @@ A product already in its operations and growth phase. I ran discovery with the p
 
 ## Software Engineer → Development Lead — Tandems Inc.
 
-Jan 2022 - Feb 2024 ( Tokyo / Remote )
+Jan 2022 - Feb 2025 ( Tokyo / Remote )
 
 Joined after an internship. Mostly client project work, moving into a development lead role partway through.
 
 ### Management support tool (development lead)
 
-From Oct 2023 · **20+ developers**
+Oct 2023 - Feb 2025 · **20+ developers**
 
 Assigned to migrate the product to Vue 3, but when the decision was made to rebuild it, I took over as **lead of the new development team**.
 
