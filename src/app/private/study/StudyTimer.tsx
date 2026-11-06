@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import HabitTracker from "./HabitTracker";
+import { addDays, dateKey } from "./habit";
 
 type Session = {
   id: number;
@@ -48,12 +50,6 @@ const WEEKDAY_LABELS: [number, string][] = [
   [3, "水"],
   [5, "金"],
 ];
-
-function dateKey(date: Date): string {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${date.getFullYear()}-${month}-${day}`;
-}
 
 function formatClock(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -105,12 +101,6 @@ function levelOf(ms: number): number {
   if (minutes < 60) return 2;
   if (minutes < 120) return 3;
   return 4;
-}
-
-function addDays(date: Date, days: number): Date {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
 }
 
 function sessionMs(session: Session, now: number): number {
@@ -682,6 +672,10 @@ export default function StudyTimer() {
             </div>
           </div>
         </section>
+
+        {sessions && now !== null && (
+          <HabitTracker sessions={sessions} now={now} />
+        )}
 
         <section>
           <h2 className="section-title">

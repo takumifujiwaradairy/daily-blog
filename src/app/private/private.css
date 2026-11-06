@@ -458,3 +458,66 @@ textarea.input {
   color: var(--label-success);
   font-weight: 600;
 }
+
+.habit-today {
+  padding: 12px 16px;
+  font-weight: 600;
+}
+
+.habit-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  padding: 16px 16px 8px;
+}
+
+.habit-head {
+  text-align: center;
+}
+
+.habit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid var(--cell-outline);
+  border-radius: 6px;
+  background: var(--level-0);
+  font-size: 12px;
+}
+
+.habit-done {
+  background: var(--success);
+  color: var(--success-fg);
+  font-weight: 600;
+}
+
+.habit-partial {
+  background: var(--level-1);
+  color: #1f2328;
+}
+
+.habit-missed {
+  border-color: var(--danger);
+  background: transparent;
+  color: var(--danger);
+}
+
+.habit-pending {
+  border-color: var(--success);
+  background: transparent;
+}
+
+.habit-future,
+.habit-off {
+  color: var(--fg-muted);
+}
+
+.habit-note {
+  margin: 0;
+  padding: 0 16px 12px;
+  color: var(--fg-muted);
+  font-size: 12px;
+}
