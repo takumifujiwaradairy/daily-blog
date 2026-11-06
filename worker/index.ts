@@ -8,7 +8,8 @@ interface Env {
 }
 
 const API_PREFIX = "/private/api/";
-const LIST_DAYS = 35;
+// 年間グラフ(53週)を描ける分だけ返す。
+const LIST_DAYS = 371;
 
 type Jwks = ReturnType<typeof createRemoteJWKSet>;
 let jwksCache: { domain: string; jwks: Jwks } | undefined;

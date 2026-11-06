@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import "../globals.css";
+import "./private.css";
 
 export const metadata: Metadata = {
-  title: "Private",
+  title: "Study",
   robots: { index: false, follow: false },
 };
 
