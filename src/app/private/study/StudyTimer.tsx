@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import HabitTracker from "./HabitTracker";
-import { addDays, dateKey } from "./habit";
+import PrivateHeader from "../PrivateHeader";
+import { addDays, dateKey } from "../habits/habit";
 
 type Session = {
   id: number;
@@ -512,9 +512,7 @@ export default function StudyTimer() {
 
   return (
     <>
-      <header className="topbar">
-        Study <span>/ 学習時間</span>
-      </header>
+      <PrivateHeader current="study" />
 
       <main className="page">
         {error && (
@@ -672,10 +670,6 @@ export default function StudyTimer() {
             </div>
           </div>
         </section>
-
-        {sessions && now !== null && (
-          <HabitTracker sessions={sessions} now={now} />
-        )}
 
         <section>
           <h2 className="section-title">

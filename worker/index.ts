@@ -15,6 +15,10 @@ const MAX_NOTE_PATH = 300;
 const MAX_MEMO = 2000;
 // 日付の打ち間違いで1日を超える記録を作らないようにする。
 const MAX_SESSION_MS = 24 * 60 * 60 * 1000;
+// 習慣はアプリから追加しないので、ここに足す。id は記録のキーなので変えない。
+const HABITS = [{ id: "morning-study", title: "平日 9:00 から1時間の学習" }];
+// 世界で最も進んだタイムゾーン（UTC+14）でも「今日」になる日までを許可する。
+const MAX_TIMEZONE_AHEAD_MS = 14 * 60 * 60 * 1000;
 const SESSION_COLUMNS = "id, started_at, ended_at, goal_id, memo";
 
 type Jwks = ReturnType<typeof createRemoteJWKSet>;
@@ -85,6 +89,17 @@ function timestamp(value: unknown): string {
   return new Date(ms).toISOString();
 }
 
+function calendarDate(value: unknown): string {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const ms = Date.parse(`${value}T00:00:00.000Z`);
+    // 2026-02-31 のように繰り上がる日付を弾く。
+    if (!Number.isNaN(ms) && new Date(ms).toISOString().slice(0, 10) === value) {
+      return value;
+    }
+  }
+  throw new BadRequest("invalid_date");
+}
+
 async function resolveGoalId(value: unknown, env: Env): Promise<number | null> {
   if (value === undefined || value === null) return null;
   if (typeof value !== "number" || !Number.isInteger(value)) {
@@ -121,6 +136,24 @@ async function handleApi(request: Request, env: Env, path: string): Promise<Resp
     return json({ goals: results });
   }
 
+  if (path === "habits" && request.method === "GET") {
+    const [checks, days] = await env.DB.batch<Record<string, string>>([
+      env.DB.prepare("SELECT habit, date FROM habit_checks"),
+      env.DB.prepare("SELECT date, day_type FROM calendar_days"),
+    ]);
+    const byHabit: Record<string, string[]> = {};
+    for (const row of checks.results) {
+      (byHabit[row.habit] ??= []).push(row.date);
+    }
+    return json({
+      habits: HABITS,
+      checks: byHabit,
+      dayTypes: Object.fromEntries(
+        days.results.map((row) => [row.date, row.day_type]),
+      ),
+    });
+  }
+
   if (request.method !== "POST") {
     return json({ error: "not_found" }, 404);
   }
@@ -145,6 +178,42 @@ async function handleApi(request: Request, env: Env, path: string): Promise<Resp
       .bind(title, notePath, now)
       .first();
     return goal ? json({ goal }, 201) : json({ error: "duplicate_title" }, 409);
+  }
+
+  if (path === "habits/check") {
+    const habit = HABITS.find((h) => h.id === body.habit)?.id;
+    if (!habit) throw new BadRequest("invalid_habit");
+    const date = calendarDate(body.date);
+    if (typeof body.done !== "boolean") throw new BadRequest("invalid_done");
+    const latest = new Date(Date.now() + MAX_TIMEZONE_AHEAD_MS)
+      .toISOString()
+      .slice(0, 10);
+    if (date > latest) throw new BadRequest("invalid_date");
+    const statement = body.done
+      ? env.DB.prepare(
+          `INSERT INTO habit_checks (habit, date, created_at) VALUES (?, ?, ?)
+           ON CONFLICT DO NOTHING`,
+        ).bind(habit, date, now)
+      : env.DB.prepare(
+          "DELETE FROM habit_checks WHERE habit = ? AND date = ?",
+        ).bind(habit, date);
+    await statement.run();
+    return json({ date, done: body.done });
+  }
+
+  if (path === "calendar/day") {
+    const date = calendarDate(body.date);
+    const dayType = body.day_type;
+    if (dayType !== "weekday" && dayType !== "holiday") {
+      throw new BadRequest("invalid_day_type");
+    }
+    await env.DB.prepare(
+      `INSERT INTO calendar_days (date, day_type) VALUES (?, ?)
+       ON CONFLICT (date) DO UPDATE SET day_type = excluded.day_type`,
+    )
+      .bind(date, dayType)
+      .run();
+    return json({ date, day_type: dayType });
   }
 
   if (path === "sessions/start") {
