@@ -439,3 +439,9 @@ textarea.input {
     color: #4493f8;
   }
 }
+
+.time-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}

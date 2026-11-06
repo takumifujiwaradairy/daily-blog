@@ -18,6 +18,8 @@ type Goal = {
 
 type Editing = {
   id: number;
+  startedAt: string;
+  endedAt: string;
   goalId: number | null;
   memo: string;
 };
@@ -26,6 +28,11 @@ const API = "/private/api/sessions";
 const GOALS_API = "/private/api/goals";
 const WEEKS = 53;
 const RECENT_SESSIONS = 10;
+const EDIT_ERRORS: Record<string, string> = {
+  invalid_time_range:
+    "終了は開始より後の現在以前の時刻にし、長さは24時間以内にしてください。",
+  overlap: "他の記録と時間が重なっています。",
+};
 const WEEKDAY_LABELS: [number, string][] = [
   [1, "月"],
   [3, "水"],
@@ -51,6 +58,20 @@ function formatDuration(ms: number): string {
   return minutes < 60
     ? `${minutes}分`
     : `${Math.floor(minutes / 60)}時間${minutes % 60}分`;
+}
+
+// datetime-local 入力の形式（端末の時刻、分単位）。
+function toInputValue(iso: string): string {
+  const date = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${dateKey(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+// 入力は分単位なので、変更していない時刻は元の値を使い、秒を失わないようにする。
+function fromInputValue(value: string, original: string): string {
+  return value === toInputValue(original)
+    ? original
+    : new Date(value).toISOString();
 }
 
 function formatTime(iso: string): string {
@@ -119,6 +140,7 @@ export default function StudyTimer() {
   const [newTitle, setNewTitle] = useState("");
   const [newNotePath, setNewNotePath] = useState("");
   const [editing, setEditing] = useState<Editing | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -291,14 +313,27 @@ export default function StudyTimer() {
   }
 
   function saveEdit() {
-    if (!editing) return;
     const target = editing;
+    const original = sessions?.find((s) => s.id === target?.id);
+    if (!target || !original?.ended_at) return;
+    const originalEnd = original.ended_at;
     return run(async () => {
+      setEditError(null);
       const res = await post(`${API}/${target.id}`, {
+        started_at: fromInputValue(target.startedAt, original.started_at),
+        ended_at: fromInputValue(target.endedAt, originalEnd),
         memo: target.memo,
         goal_id: target.goalId,
       });
-      if (!res.ok) throw new Error(String(res.status));
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        const message = data?.error && EDIT_ERRORS[data.error];
+        if (!message) throw new Error(String(res.status));
+        setEditError(message);
+        return;
+      }
       setEditing(null);
       await load();
     });
@@ -551,13 +586,16 @@ export default function StudyTimer() {
                           <button
                             type="button"
                             className="link-btn"
-                            onClick={() =>
+                            onClick={() => {
+                              setEditError(null);
                               setEditing({
                                 id: s.id,
+                                startedAt: toInputValue(s.started_at),
+                                endedAt: toInputValue(s.ended_at ?? s.started_at),
                                 goalId: s.goal_id,
                                 memo: s.memo ?? "",
-                              })
-                            }
+                              });
+                            }}
                           >
                             編集
                           </button>
@@ -572,6 +610,37 @@ export default function StudyTimer() {
                           saveEdit();
                         }}
                       >
+                        {editError && (
+                          <div role="alert" className="flash">
+                            {editError}
+                          </div>
+                        )}
+                        <div className="time-row">
+                          <label className="field">
+                            開始
+                            <input
+                              className="input"
+                              type="datetime-local"
+                              required
+                              value={editing.startedAt}
+                              onChange={(e) =>
+                                setEditing({ ...editing, startedAt: e.target.value })
+                              }
+                            />
+                          </label>
+                          <label className="field">
+                            終了
+                            <input
+                              className="input"
+                              type="datetime-local"
+                              required
+                              value={editing.endedAt}
+                              onChange={(e) =>
+                                setEditing({ ...editing, endedAt: e.target.value })
+                              }
+                            />
+                          </label>
+                        </div>
                         <select
                           className="input"
                           aria-label="目標"

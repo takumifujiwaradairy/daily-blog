@@ -13,6 +13,8 @@ const LIST_DAYS = 371;
 const MAX_TITLE = 100;
 const MAX_NOTE_PATH = 300;
 const MAX_MEMO = 2000;
+// 日付の打ち間違いで1日を超える記録を作らないようにする。
+const MAX_SESSION_MS = 24 * 60 * 60 * 1000;
 const SESSION_COLUMNS = "id, started_at, ended_at, goal_id, memo";
 
 type Jwks = ReturnType<typeof createRemoteJWKSet>;
@@ -74,6 +76,13 @@ function optionalText(value: unknown, max: number, name: string): string | null 
     throw new BadRequest(`invalid_${name}`);
   }
   return value.trim() || null;
+}
+
+// 重なりの判定を文字列比較で行うので、toISOString の形式にそろえる。
+function timestamp(value: unknown): string {
+  const ms = typeof value === "string" ? Date.parse(value) : NaN;
+  if (Number.isNaN(ms)) throw new BadRequest("invalid_time_range");
+  return new Date(ms).toISOString();
 }
 
 async function resolveGoalId(value: unknown, env: Env): Promise<number | null> {
@@ -161,16 +170,34 @@ async function handleApi(request: Request, env: Env, path: string): Promise<Resp
     return session ? json({ session }) : json({ error: "not_running" }, 409);
   }
 
-  // 記録後のメモと目標の修正。Obsidian へは次回の書き出しで反映される。
+  // 記録後の時間、メモ、目標の修正。Obsidian へは次回の書き出しで反映される。
   const edit = path.match(/^sessions\/(\d+)$/);
   if (edit) {
     const memo = optionalText(body.memo, MAX_MEMO, "memo");
     const goalId = await resolveGoalId(body.goal_id, env);
+    const startedAt = timestamp(body.started_at);
+    const endedAt = timestamp(body.ended_at);
+    const duration = Date.parse(endedAt) - Date.parse(startedAt);
+    if (duration <= 0 || duration > MAX_SESSION_MS || endedAt > now) {
+      throw new BadRequest("invalid_time_range");
+    }
+    const id = Number(edit[1]);
+    // 重なると同じ時間を二重に集計してしまう。
+    const overlapping = await env.DB.prepare(
+      `SELECT id FROM study_sessions
+       WHERE id != ? AND started_at < ? AND (ended_at IS NULL OR ended_at > ?)
+       LIMIT 1`,
+    )
+      .bind(id, endedAt, startedAt)
+      .first();
+    if (overlapping) return json({ error: "overlap" }, 409);
+    // 計測中の記録を編集で終了させないよう、終了済みだけを対象にする。
     const session = await env.DB.prepare(
-      `UPDATE study_sessions SET memo = ?, goal_id = ? WHERE id = ?
+      `UPDATE study_sessions SET started_at = ?, ended_at = ?, memo = ?, goal_id = ?
+       WHERE id = ? AND ended_at IS NOT NULL
        RETURNING ${SESSION_COLUMNS}`,
     )
-      .bind(memo, goalId, Number(edit[1]))
+      .bind(startedAt, endedAt, memo, goalId, id)
       .first();
     return session ? json({ session }) : json({ error: "not_found" }, 404);
   }
