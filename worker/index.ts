@@ -161,11 +161,16 @@ async function handleApi(request: Request, env: Env, path: string): Promise<Resp
 
   if (path === "sessions/stop") {
     const memo = optionalText(body.memo, MAX_MEMO, "memo");
+    // ポモドーロは、タブを閉じていても予定の時刻で終わった記録にする。
+    // 端末の時計が進んでいても未来の時刻にはしない。
+    const requested = body.ended_at === undefined ? now : timestamp(body.ended_at);
+    const endedAt = requested < now ? requested : now;
     const session = await env.DB.prepare(
-      `UPDATE study_sessions SET ended_at = ?, memo = ? WHERE ended_at IS NULL
+      `UPDATE study_sessions SET ended_at = ?, memo = ?
+       WHERE ended_at IS NULL AND started_at < ?
        RETURNING ${SESSION_COLUMNS}`,
     )
-      .bind(now, memo)
+      .bind(endedAt, memo, endedAt)
       .first();
     return session ? json({ session }) : json({ error: "not_running" }, 409);
   }

@@ -445,3 +445,16 @@ textarea.input {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 8px;
 }
+
+.mode-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 16px 0;
+}
+
+.mode-switch .btn[aria-pressed="true"] {
+  border-color: var(--success);
+  color: var(--label-success);
+  font-weight: 600;
+}

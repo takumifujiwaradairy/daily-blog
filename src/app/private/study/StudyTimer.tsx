@@ -24,10 +24,20 @@ type Editing = {
   memo: string;
 };
 
+type Mode = "normal" | "pomodoro";
+
+type Pomodoro =
+  | { phase: "focus"; sessionId: number; endsAt: number }
+  | { phase: "break"; endsAt: number };
+
 const API = "/private/api/sessions";
 const GOALS_API = "/private/api/goals";
 const WEEKS = 53;
 const RECENT_SESSIONS = 10;
+const FOCUS_MS = 25 * 60_000;
+const BREAK_MS = 5 * 60_000;
+const MODE_KEY = "study-timer-mode";
+const POMODORO_KEY = "study-pomodoro";
 const EDIT_ERRORS: Record<string, string> = {
   invalid_time_range:
     "終了は開始より後の現在以前の時刻にし、長さは24時間以内にしてください。",
@@ -49,6 +59,12 @@ function formatClock(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${pad(Math.floor(total / 3600))}:${pad(Math.floor(total / 60) % 60)}:${pad(total % 60)}`;
+}
+
+function formatCountdown(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
 }
 
 function formatDuration(ms: number): string {
@@ -124,6 +140,63 @@ function writeDraft(sessionId: number, memo: string | null) {
   }
 }
 
+// 再読み込みやタブを閉じた後も続けられるよう、残り時間ではなく終了時刻を保存する。
+function readPomodoro(): Pomodoro | null {
+  try {
+    const stored = localStorage.getItem(POMODORO_KEY);
+    return stored ? (JSON.parse(stored) as Pomodoro) : null;
+  } catch {
+    return null;
+  }
+}
+
+function readMode(): Mode {
+  try {
+    return localStorage.getItem(MODE_KEY) === "pomodoro" ? "pomodoro" : "normal";
+  } catch {
+    return "normal";
+  }
+}
+
+function writeStored(key: string, value: string | null) {
+  try {
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch {
+    // 保存できなくても、開いている間のタイマーは動く。
+  }
+}
+
+function askNotificationPermission() {
+  try {
+    if (Notification.permission === "default") {
+      void Notification.requestPermission();
+    }
+  } catch {
+    // 通知に対応していない環境では、音と画面表示だけにする。
+  }
+}
+
+// 通知も音も補助なので、使えない環境では黙って諦める。
+function announce(message: string) {
+  try {
+    if (Notification.permission === "granted") new Notification(message);
+  } catch {
+    // Android の Chrome などは、この形の通知に対応していない。
+  }
+  try {
+    const audio = new AudioContext();
+    const oscillator = audio.createOscillator();
+    oscillator.frequency.value = 880;
+    oscillator.connect(audio.destination);
+    oscillator.onended = () => void audio.close();
+    oscillator.start();
+    oscillator.stop(audio.currentTime + 0.4);
+  } catch {
+    // 音を出せなくても記録には影響しない。
+  }
+}
+
 function goalValue(value: string): number | null {
   return value === "" ? null : Number(value);
 }
@@ -141,6 +214,9 @@ export default function StudyTimer() {
   const [newNotePath, setNewNotePath] = useState("");
   const [editing, setEditing] = useState<Editing | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
+  const [mode, setMode] = useState<Mode>("normal");
+  const [pomodoro, setPomodoro] = useState<Pomodoro | null>(null);
+  const finishingRef = useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -166,8 +242,15 @@ export default function StudyTimer() {
     });
   }, []);
 
+  const savePomodoro = useCallback((next: Pomodoro | null) => {
+    setPomodoro(next);
+    writeStored(POMODORO_KEY, next && JSON.stringify(next));
+  }, []);
+
   useEffect(() => {
     setNow(Date.now());
+    setMode(readMode());
+    setPomodoro(readPomodoro());
     // Access のセッションが切れると fetch 自体が失敗するので再読み込みを促す。
     load()
       .then((loadedSessions) => {
@@ -267,6 +350,45 @@ export default function StudyTimer() {
     return byGoal;
   }, [sessions, currentTime]);
 
+  const focus =
+    pomodoro?.phase === "focus" && pomodoro.sessionId === active?.id
+      ? pomodoro
+      : null;
+  const onBreak = pomodoro?.phase === "break" ? pomodoro : null;
+  const countdownEnd = focus?.endsAt ?? onBreak?.endsAt ?? null;
+  const countdown =
+    countdownEnd === null ? null : formatCountdown(countdownEnd - currentTime);
+
+  // ポモドーロの終了判定。閉じている間に時間が過ぎていても、開いた時点で処理する。
+  useEffect(() => {
+    if (!pomodoro || !loaded || busy) return;
+    if (pomodoro.phase === "break") {
+      if (currentTime >= pomodoro.endsAt) {
+        savePomodoro(null);
+        announce("休憩が終わりました");
+      }
+      return;
+    }
+    // 別のタブや端末で終了された場合は、ここでのカウントダウンをやめる。
+    if (!focus) {
+      savePomodoro(null);
+      return;
+    }
+    if (currentTime >= focus.endsAt && !finishingRef.current) {
+      // 失敗したら再読み込みまで再試行しない。毎秒エラーを出さないため。
+      finishingRef.current = true;
+      void finishFocus(focus);
+    }
+    // finishFocus は memo の最新値を使うので、毎回作り直される関数を依存に入れない。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pomodoro, focus, loaded, busy, currentTime, savePomodoro]);
+
+  useEffect(() => {
+    document.title = countdown
+      ? `${countdown} ${onBreak ? "休憩" : "集中"}`
+      : "Study";
+  }, [countdown, onBreak]);
+
   async function run(action: () => Promise<void>) {
     setBusy(true);
     setError(null);
@@ -279,7 +401,37 @@ export default function StudyTimer() {
     }
   }
 
+  function finishFocus(target: { endsAt: number }) {
+    return run(async () => {
+      const res = await post(`${API}/stop`, {
+        memo,
+        ended_at: new Date(target.endsAt).toISOString(),
+      });
+      if (!res.ok && res.status !== 409) {
+        throw new Error(String(res.status));
+      }
+      if (res.ok) {
+        if (active) writeDraft(active.id, null);
+        setMemo("");
+        savePomodoro({ phase: "break", endsAt: target.endsAt + BREAK_MS });
+        announce("集中が終わりました。休憩しましょう");
+      } else {
+        savePomodoro(null);
+      }
+      await load();
+      finishingRef.current = false;
+    });
+  }
+
+  function changeMode(next: Mode) {
+    setMode(next);
+    writeStored(MODE_KEY, next);
+    if (next === "normal") savePomodoro(null);
+  }
+
   function toggle() {
+    const startingPomodoro = mode === "pomodoro" && !active;
+    if (startingPomodoro) askNotificationPermission();
     return run(async () => {
       const res = active
         ? await post(`${API}/stop`, { memo })
@@ -292,7 +444,21 @@ export default function StudyTimer() {
         writeDraft(active.id, null);
         setMemo("");
       }
+      // 途中で終了したら、実際の時間で記録して休憩には入らない。
+      if (active) savePomodoro(null);
+      const started =
+        startingPomodoro && res.ok
+          ? ((await res.json()) as { session: Session }).session
+          : null;
       await load();
+      // 読み直す前に設定すると、計測中の記録がないと判定されて消えてしまう。
+      if (started) {
+        savePomodoro({
+          phase: "focus",
+          sessionId: started.id,
+          endsAt: new Date(started.started_at).getTime() + FOCUS_MS,
+        });
+      }
     });
   }
 
@@ -371,21 +537,55 @@ export default function StudyTimer() {
           <div className="box-header">
             計測
             <span className={`label ${active ? "label-running" : ""}`}>
-              {active ? "計測中" : "停止中"}
+              {focus ? "集中中" : active ? "計測中" : onBreak ? "休憩中" : "停止中"}
             </span>
+          </div>
+          <div className="mode-switch" role="group" aria-label="タイマーの種類">
+            {(
+              [
+                ["normal", "通常"],
+                ["pomodoro", "ポモドーロ（25分 / 休憩5分）"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className="btn btn-small"
+                aria-pressed={mode === value}
+                disabled={Boolean(active)}
+                onClick={() => changeMode(value)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
           <div className="timer">
             <div className="clock" role="timer">
-              {formatClock(active ? currentTime - new Date(active.started_at).getTime() : 0)}
+              {countdown ??
+                (active
+                  ? formatClock(currentTime - new Date(active.started_at).getTime())
+                  : mode === "pomodoro"
+                    ? formatCountdown(FOCUS_MS)
+                    : formatClock(0))}
             </div>
-            <button
-              type="button"
-              className={`btn ${active ? "btn-danger" : "btn-primary"}`}
-              onClick={toggle}
-              disabled={busy || !loaded}
-            >
-              {active ? "終了" : "開始"}
-            </button>
+            {onBreak ? (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => savePomodoro(null)}
+              >
+                休憩をスキップ
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={`btn ${active ? "btn-danger" : "btn-primary"}`}
+                onClick={toggle}
+                disabled={busy || !loaded}
+              >
+                {active ? "終了" : "開始"}
+              </button>
+            )}
           </div>
           <div className="fields">
             {active ? (
