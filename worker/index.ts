@@ -16,7 +16,21 @@ const MAX_MEMO = 2000;
 // 日付の打ち間違いで1日を超える記録を作らないようにする。
 const MAX_SESSION_MS = 24 * 60 * 60 * 1000;
 // 習慣はアプリから追加しないので、ここに足す。id は記録のキーなので変えない。
-const HABITS = [{ id: "morning-study", title: "平日 9:00 から1時間の学習" }];
+// holidayGoal が null の習慣は、祝日を対象にしない。
+const HABITS = [
+  {
+    id: "morning-study",
+    title: "朝の学習",
+    weekdayGoal: "9:00 から1時間",
+    holidayGoal: null,
+  },
+  {
+    id: "evening-study",
+    title: "仕事終わりの学習",
+    weekdayGoal: "仕事終わりに1時間",
+    holidayGoal: "2時間",
+  },
+];
 // 世界で最も進んだタイムゾーン（UTC+14）でも「今日」になる日までを許可する。
 const MAX_TIMEZONE_AHEAD_MS = 14 * 60 * 60 * 1000;
 const SESSION_COLUMNS = "id, started_at, ended_at, goal_id, memo";

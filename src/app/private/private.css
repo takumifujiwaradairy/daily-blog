@@ -580,3 +580,13 @@ textarea.input {
   color: var(--label-success);
   font-weight: 600;
 }
+
+.calendar-holiday:not(.habit-done) > span:first-child {
+  color: var(--danger);
+}
+
+.day-panel-goal {
+  display: block;
+  color: var(--fg-muted);
+  font-weight: 400;
+}

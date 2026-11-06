@@ -5,7 +5,12 @@ import PrivateHeader from "../PrivateHeader";
 import HabitCalendar from "./HabitCalendar";
 import { dateKey, type DayType } from "./habit";
 
-type Habit = { id: string; title: string };
+type Habit = {
+  id: string;
+  title: string;
+  weekdayGoal: string;
+  holidayGoal: string | null;
+};
 
 type HabitsResponse = {
   habits: Habit[];
@@ -101,10 +106,13 @@ export default function HabitsApp() {
             <HabitCalendar
               key={habit.id}
               title={habit.title}
+              weekdayGoal={habit.weekdayGoal}
+              holidayGoal={habit.holidayGoal}
               today={today}
               data={{
                 checks: data.checks[habit.id] ?? [],
                 dayTypes: data.dayTypes,
+                includesHolidays: habit.holidayGoal !== null,
               }}
               busy={busy}
               onToggleDone={(date, done) => toggleDone(habit.id, date, done)}

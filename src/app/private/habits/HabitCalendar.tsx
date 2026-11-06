@@ -25,6 +25,8 @@ const STATUS: Record<HabitStatus, { label: string; mark: string }> = {
 
 export default function HabitCalendar({
   title,
+  weekdayGoal,
+  holidayGoal,
   today,
   data,
   busy,
@@ -32,6 +34,8 @@ export default function HabitCalendar({
   onChangeDayType,
 }: {
   title: string;
+  weekdayGoal: string;
+  holidayGoal: string | null;
   today: string;
   data: HabitData;
   busy: boolean;
@@ -55,6 +59,7 @@ export default function HabitCalendar({
   const selectedDate = parseKey(selected);
   const selectedDone = data.checks.includes(selected);
   const selectedType = dayTypeOf(selected, data);
+  const selectedGoal = selectedType === "weekday" ? weekdayGoal : holidayGoal;
 
   return (
     <section>
@@ -63,7 +68,7 @@ export default function HabitCalendar({
         <div className="stats">
           <div className="stat">
             <div className="stat-value">{summary.streak}日</div>
-            <div className="stat-label">連続（平日）</div>
+            <div className="stat-label">連続</div>
           </div>
           <div className="stat">
             <div className="stat-value">
@@ -114,7 +119,7 @@ export default function HabitCalendar({
               <button
                 type="button"
                 key={key}
-                className={`calendar-day habit-${status}${key === today ? " calendar-today" : ""}`}
+                className={`calendar-day habit-${status}${key === today ? " calendar-today" : ""}${dayTypeOf(key, data) === "holiday" ? " calendar-holiday" : ""}`}
                 aria-pressed={key === selected}
                 aria-label={`${key} ${STATUS[status].label}`}
                 title={`${key}: ${STATUS[status].label}`}
@@ -134,6 +139,9 @@ export default function HabitCalendar({
             {selectedDate.getMonth() + 1}/{selectedDate.getDate()}（
             {WEEKDAYS[selectedDate.getDay()]}）
             {selected === today && " 今日"}
+            <span className="day-panel-goal">
+              {selectedGoal ? `目標: ${selectedGoal}` : "祝日は対象外"}
+            </span>
           </div>
           <div className="day-panel-actions">
             <button

@@ -5,6 +5,7 @@ export type DayType = "weekday" | "holiday";
 export type HabitData = {
   checks: string[];
   dayTypes: Record<string, DayType>;
+  includesHolidays?: boolean;
 };
 
 export type HabitStatus =
@@ -37,6 +38,10 @@ export function dayTypeOf(key: string, data: HabitData): DayType {
   return data.dayTypes[key] ?? (weekday === 0 || weekday === 6 ? "holiday" : "weekday");
 }
 
+function isTarget(key: string, data: HabitData): boolean {
+  return dayTypeOf(key, data) === "weekday" || data.includesHolidays === true;
+}
+
 // 最初に「できた」を付けた日から記録を始める。それより前の日は未達に数えない。
 function firstCheck(data: HabitData): string | null {
   return data.checks.reduce<string | null>(
@@ -46,10 +51,10 @@ function firstCheck(data: HabitData): string | null {
 }
 
 export function statusOf(key: string, today: string, data: HabitData): HabitStatus {
-  const type = dayTypeOf(key, data);
-  if (key > today) return type === "holiday" ? "holiday" : "future";
+  const target = isTarget(key, data);
+  if (key > today) return target ? "future" : "holiday";
   if (data.checks.includes(key)) return "done";
-  if (type === "holiday") return "holiday";
+  if (!target) return "holiday";
   if (key === today) return "pending";
   const first = firstCheck(data);
   return first === null || key < first ? "untracked" : "missed";
@@ -62,7 +67,7 @@ export type HabitSummary = {
   rate: number | null;
 };
 
-// 集計の対象は平日だけ。祝日は、できても連続や達成率を動かさない。
+// 集計の対象はその習慣の対象日だけ。対象外の日は、できても連続や達成率を動かさない。
 export function summarize(today: string, data: HabitData): HabitSummary {
   const first = firstCheck(data);
   let done = 0;
@@ -73,7 +78,7 @@ export function summarize(today: string, data: HabitData): HabitSummary {
     const start = parseKey(first);
     for (let date = parseKey(today); date >= start; date = addDays(date, -1)) {
       const key = dateKey(date);
-      if (dayTypeOf(key, data) !== "weekday") continue;
+      if (!isTarget(key, data)) continue;
       const status = statusOf(key, today, data);
       if (status === "pending") continue;
       due += 1;
@@ -90,7 +95,7 @@ export function summarize(today: string, data: HabitData): HabitSummary {
   const sunday = addDays(todayDate, -todayDate.getDay());
   const week = [0, 1, 2, 3, 4, 5, 6]
     .map((offset) => dateKey(addDays(sunday, offset)))
-    .filter((key) => dayTypeOf(key, data) === "weekday");
+    .filter((key) => isTarget(key, data));
 
   return {
     streak,
