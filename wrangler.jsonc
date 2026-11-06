@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "daily-blog",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-08-14",
   // 独自ドメインが通ったので workers.dev の入口は閉じる。
   // 同じ内容が2つのURLで見えると重複コンテンツになり、
@@ -16,6 +17,23 @@
   "assets": {
     // next build が output: "export" で吐く静的ファイル群
     "directory": "./out",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // API だけ Worker を通す。それ以外は今まで通りアセットを直接返す。
+    "run_worker_first": ["/private/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-blog-study",
+      "database_id": "808f25d7-68cb-41b3-99bf-1ca3cffd3cc1",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Cloudflare Access の値。公開情報なので secret にしない。
+  // 空にすると API は常に 401 を返す。
+  "vars": {
+    "ACCESS_TEAM_DOMAIN": "https://young-truth-1e2b.cloudflareaccess.com",
+    "ACCESS_AUD": "9156b435501babb11238df410c6d3a8f73b26e6eaddc68bda6593dc0f02d1061"
   }
 }
