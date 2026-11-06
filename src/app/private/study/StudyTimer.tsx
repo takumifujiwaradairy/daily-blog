@@ -6,9 +6,24 @@ type Session = {
   id: number;
   started_at: string;
   ended_at: string | null;
+  goal_id: number | null;
+  memo: string | null;
+};
+
+type Goal = {
+  id: number;
+  title: string;
+  note_path: string | null;
+};
+
+type Editing = {
+  id: number;
+  goalId: number | null;
+  memo: string;
 };
 
 const API = "/private/api/sessions";
+const GOALS_API = "/private/api/goals";
 const WEEKS = 53;
 const RECENT_SESSIONS = 10;
 const WEEKDAY_LABELS: [number, string][] = [
@@ -66,28 +81,82 @@ function sessionMs(session: Session, now: number): number {
   return Math.max(0, end - new Date(session.started_at).getTime());
 }
 
+function draftKey(sessionId: number): string {
+  return `study-memo-draft-${sessionId}`;
+}
+
+// 書きかけのメモは再読み込みで消えないようにする。保存できない環境でも計測は止めない。
+function readDraft(sessionId: number): string {
+  try {
+    return localStorage.getItem(draftKey(sessionId)) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function writeDraft(sessionId: number, memo: string | null) {
+  try {
+    if (memo === null) localStorage.removeItem(draftKey(sessionId));
+    else localStorage.setItem(draftKey(sessionId), memo);
+  } catch {
+    // 下書きは補助機能なので、失敗しても無視する。
+  }
+}
+
+function goalValue(value: string): number | null {
+  return value === "" ? null : Number(value);
+}
+
 export default function StudyTimer() {
   const [sessions, setSessions] = useState<Session[] | null>(null);
   // 静的HTMLはビルド時に作られるので、現在時刻はマウント後に入れる。
   const [now, setNow] = useState<number | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [goalId, setGoalId] = useState<number | null>(null);
+  const [memo, setMemo] = useState("");
+  const [addingGoal, setAddingGoal] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newNotePath, setNewNotePath] = useState("");
+  const [editing, setEditing] = useState<Editing | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
-    const res = await fetch(API, { cache: "no-store" });
-    if (!res.ok) throw new Error(String(res.status));
-    const data = (await res.json()) as { sessions: Session[] };
+    const [sessionsRes, goalsRes] = await Promise.all([
+      fetch(API, { cache: "no-store" }),
+      fetch(GOALS_API, { cache: "no-store" }),
+    ]);
+    if (!sessionsRes.ok || !goalsRes.ok) throw new Error("load failed");
+    const data = (await sessionsRes.json()) as { sessions: Session[] };
+    const goalData = (await goalsRes.json()) as { goals: Goal[] };
     setSessions(data.sessions);
+    setGoals(goalData.goals);
+    return data.sessions;
+  }, []);
+
+  const post = useCallback(async (path: string, body: unknown) => {
+    return fetch(path, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
   }, []);
 
   useEffect(() => {
     setNow(Date.now());
     // Access のセッションが切れると fetch 自体が失敗するので再読み込みを促す。
-    load().catch(() =>
-      setError("読み込めませんでした。ページを再読み込みしてください。"),
-    );
+    load()
+      .then((loadedSessions) => {
+        // 同じ目標を続けることが多いので、直近の記録の目標を初期値にする。
+        setGoalId(loadedSessions[0]?.goal_id ?? null);
+        const running = loadedSessions.find((s) => s.ended_at === null);
+        if (running) setMemo(readDraft(running.id));
+      })
+      .catch(() =>
+        setError("読み込めませんでした。ページを再読み込みしてください。"),
+      );
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, [load]);
@@ -101,6 +170,8 @@ export default function StudyTimer() {
   }, [loaded]);
 
   const active = sessions?.find((s) => s.ended_at === null);
+  const goalTitle = (id: number | null) =>
+    goals.find((g) => g.id === id)?.title ?? null;
   const currentTime = now ?? 0;
 
   // 日をまたいだ学習は開始日に計上する。
@@ -163,23 +234,87 @@ export default function StudyTimer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totals, todayKey, days]);
 
-  async function toggle() {
+  const goalTotals = useMemo(() => {
+    const byGoal = new Map<number | null, { ms: number; count: number }>();
+    for (const s of sessions ?? []) {
+      const entry = byGoal.get(s.goal_id) ?? { ms: 0, count: 0 };
+      entry.ms += sessionMs(s, currentTime);
+      entry.count += 1;
+      byGoal.set(s.goal_id, entry);
+    }
+    return byGoal;
+  }, [sessions, currentTime]);
+
+  async function run(action: () => Promise<void>) {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`${API}/${active ? "stop" : "start"}`, {
-        method: "POST",
-      });
-      // 409 は別タブ等で状態が変わった場合。最新の状態を読み直せば解消する。
-      if (!res.ok && res.status !== 409) {
-        throw new Error(String(res.status));
-      }
-      await load();
+      await action();
     } catch {
       setError("保存できませんでした。ページを再読み込みしてください。");
     } finally {
       setBusy(false);
     }
+  }
+
+  function toggle() {
+    return run(async () => {
+      const res = active
+        ? await post(`${API}/stop`, { memo })
+        : await post(`${API}/start`, { goal_id: goalId });
+      // 409 は別タブ等で状態が変わった場合。最新の状態を読み直せば解消する。
+      if (!res.ok && res.status !== 409) {
+        throw new Error(String(res.status));
+      }
+      if (active && res.ok) {
+        writeDraft(active.id, null);
+        setMemo("");
+      }
+      await load();
+    });
+  }
+
+  function addGoal() {
+    return run(async () => {
+      const res = await post(GOALS_API, {
+        title: newTitle,
+        note_path: newNotePath,
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = (await res.json()) as { goal: Goal };
+      setGoalId(data.goal.id);
+      setNewTitle("");
+      setNewNotePath("");
+      setAddingGoal(false);
+      await load();
+    });
+  }
+
+  function saveEdit() {
+    if (!editing) return;
+    const target = editing;
+    return run(async () => {
+      const res = await post(`${API}/${target.id}`, {
+        memo: target.memo,
+        goal_id: target.goalId,
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      setEditing(null);
+      await load();
+    });
+  }
+
+  function goalOptions() {
+    return (
+      <>
+        <option value="">目標なし</option>
+        {goals.map((g) => (
+          <option key={g.id} value={g.id}>
+            {g.title}
+          </option>
+        ))}
+      </>
+    );
   }
 
   const selectedKey = selected ?? todayKey;
@@ -216,6 +351,84 @@ export default function StudyTimer() {
             >
               {active ? "終了" : "開始"}
             </button>
+          </div>
+          <div className="fields">
+            {active ? (
+              <>
+                <div className="field-text">
+                  目標: {goalTitle(active.goal_id) ?? "なし"}
+                </div>
+                <label className="field">
+                  メモ（終了時に保存）
+                  <textarea
+                    className="input"
+                    rows={3}
+                    maxLength={2000}
+                    value={memo}
+                    placeholder="何を学習したか"
+                    onChange={(e) => {
+                      setMemo(e.target.value);
+                      writeDraft(active.id, e.target.value);
+                    }}
+                  />
+                </label>
+              </>
+            ) : (
+              <>
+                <div className="field-row">
+                  <label className="field">
+                    目標
+                    <select
+                      className="input"
+                      value={goalId ?? ""}
+                      onChange={(e) => setGoalId(goalValue(e.target.value))}
+                    >
+                      {goalOptions()}
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    className="btn btn-small"
+                    onClick={() => setAddingGoal(!addingGoal)}
+                  >
+                    目標を追加
+                  </button>
+                </div>
+                {addingGoal && (
+                  <form
+                    className="add-goal"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      addGoal();
+                    }}
+                  >
+                    <label className="field">
+                      目標名
+                      <input
+                        className="input"
+                        required
+                        maxLength={100}
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                      />
+                    </label>
+                    <label className="field">
+                      Obsidian のノートパス（任意）
+                      <input
+                        className="input"
+                        maxLength={300}
+                        value={newNotePath}
+                        placeholder="05_目標/2026年_29歳_年間目標"
+                        onChange={(e) => setNewNotePath(e.target.value)}
+                      />
+                    </label>
+                    <button type="submit" className="btn btn-small" disabled={busy}>
+                      追加
+                    </button>
+                  </form>
+                )}
+              </>
+            )}
           </div>
           <div className="stats">
             <div className="stat">
@@ -291,21 +504,113 @@ export default function StudyTimer() {
           </div>
         </section>
 
+        {goals.length > 0 && (
+          <section>
+            <h2 className="section-title">目標別（過去1年）</h2>
+            <div className="box">
+              <ul className="session-list">
+                {[...goals.map((g) => g.id), null]
+                  .filter((id) => goalTotals.has(id) || id !== null)
+                  .map((id) => {
+                    const total = goalTotals.get(id);
+                    return (
+                      <li key={id ?? "none"} className="session">
+                        <span>{goalTitle(id) ?? "目標なし"}</span>
+                        <span className="session-duration">
+                          {formatDuration(total?.ms ?? 0)} / {total?.count ?? 0}回
+                        </span>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          </section>
+        )}
+
         <section>
           <h2 className="section-title">最近の記録</h2>
           <div className="box">
             {sessions && sessions.length > 0 ? (
               <ul className="session-list">
                 {sessions.slice(0, RECENT_SESSIONS).map((s) => (
-                  <li key={s.id} className="session">
-                    <span>
-                      {dateKey(new Date(s.started_at))} {formatTime(s.started_at)}
-                      {" - "}
-                      {s.ended_at ? formatTime(s.ended_at) : "計測中"}
-                    </span>
-                    <span className="session-duration">
-                      {formatDuration(sessionMs(s, currentTime))}
-                    </span>
+                  <li key={s.id} className="session session-entry">
+                    <div className="session-line">
+                      <span>
+                        {dateKey(new Date(s.started_at))} {formatTime(s.started_at)}
+                        {" - "}
+                        {s.ended_at ? formatTime(s.ended_at) : "計測中"}
+                        {goalTitle(s.goal_id) && (
+                          <span className="label label-goal">
+                            {goalTitle(s.goal_id)}
+                          </span>
+                        )}
+                      </span>
+                      <span className="session-duration">
+                        {formatDuration(sessionMs(s, currentTime))}
+                        {s.ended_at && (
+                          <button
+                            type="button"
+                            className="link-btn"
+                            onClick={() =>
+                              setEditing({
+                                id: s.id,
+                                goalId: s.goal_id,
+                                memo: s.memo ?? "",
+                              })
+                            }
+                          >
+                            編集
+                          </button>
+                        )}
+                      </span>
+                    </div>
+                    {editing?.id === s.id ? (
+                      <form
+                        className="add-goal"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          saveEdit();
+                        }}
+                      >
+                        <select
+                          className="input"
+                          aria-label="目標"
+                          value={editing.goalId ?? ""}
+                          onChange={(e) =>
+                            setEditing({
+                              ...editing,
+                              goalId: goalValue(e.target.value),
+                            })
+                          }
+                        >
+                          {goalOptions()}
+                        </select>
+                        <textarea
+                          className="input"
+                          aria-label="メモ"
+                          rows={3}
+                          maxLength={2000}
+                          value={editing.memo}
+                          onChange={(e) =>
+                            setEditing({ ...editing, memo: e.target.value })
+                          }
+                        />
+                        <div className="form-actions">
+                          <button type="submit" className="btn btn-small" disabled={busy}>
+                            保存
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-small"
+                            onClick={() => setEditing(null)}
+                          >
+                            キャンセル
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      s.memo && <p className="session-memo">{s.memo}</p>
+                    )}
                   </li>
                 ))}
               </ul>
