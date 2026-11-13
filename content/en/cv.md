@@ -1,12 +1,12 @@
 ---
 title: "Profile"
-summary: "Full stack engineer. Employee #1 and CTO of a startup, now in Australia."
+summary: "Full stack engineer. Co-founder and Engineering Manager of a startup, now in Australia."
 ---
 
 As of August 2026
 
 - Full stack web engineer ( backend, frontend, infrastructure )
-- Most recently employee #1 and CTO of a startup
+- Most recently co-founder and Engineering Manager of a startup
 - Born 1997
 - Based in Australia ( Working Holiday visa subclass 417, full work rights )
 
@@ -45,7 +45,7 @@ Tools
 
 # Leadership and management
 
-## As CTO
+## As Engineering Manager
 
 From 2026
 
@@ -105,7 +105,7 @@ Oct 2023 - Feb 2025
 
 Most recent first
 
-## Co-Founder & CTO — Yourtory Inc.
+## Co-Founder & Engineering Manager — Yourtory Inc.
 
 Mar 2026 - Jul 2026 ( Okinawa / Remote ) · 3 developers
 
