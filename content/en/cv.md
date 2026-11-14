@@ -255,7 +255,7 @@ Apr 2017 - Mar 2021 ( Tokyo )
 # Currently
 
 - I am currently **based in Australia**, focusing on **English** (IELTS in progress) and on **studying security**.
-- Going forward I want to **specialise in security** — particularly AI security and offensive security. The intersection of building software and breaking it.
+- I am interested in security.
 - Next, I am looking for **somewhere I can settle in and work for the long term**.
 - I write up what I build and what I find on this site.
 
