@@ -59,7 +59,7 @@ From 2026
 
 Oct 2023 - Feb 2025
 
-- **Led the new development team** on a cross-company project with 20+ developers.
+- **Led a new five-person development team** on a cross-company project of 20+ people.
 - Ran planning, specification work, spec review and PR review for my team, while still designing and implementing.
 - Ran client negotiation and coordination between stakeholders.
 
@@ -157,9 +157,9 @@ Joined after an internship. Mostly client project work, moving into a developmen
 
 ### Management support tool (development lead)
 
-Oct 2023 - Feb 2025 · **20+ developers**
+Oct 2023 - Feb 2025 · **20+ people across the whole development team**
 
-Assigned to migrate the product to Vue 3, but when the decision was made to rebuild it, I took over as **lead of the new development team**.
+Assigned to migrate the product to Vue 3, but when the decision was made to rebuild it, I took over as **lead of a new five-person development team**.
 
 - Managed **developers across multiple companies** and handled client negotiation.
 - Owned specification cleanup, team planning, spec review and PR review, while still designing and implementing.
