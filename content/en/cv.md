@@ -228,7 +228,7 @@ Already in operation, so my work was small changes and testing.
 
 ## Software Engineer — Fuji Soft Incorporated
 
-Apr 2021 - Dec 2021 ( Yokohama / On-site )
+Apr 2021 - Feb 2022 ( Yokohama / On-site )
 
 ### Test operations for a large-scale horse racing platform
 
