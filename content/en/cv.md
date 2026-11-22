@@ -115,7 +115,6 @@ Mar 2026 - Jul 2026 ( Okinawa / Remote ) · 3 developers
 - Hired and onboarded two engineers, growing the team to four.
 - Shipped the platform and its monetisation layer to production.
 - Left as the company entered its VC round, returning all equity.
-- **The commercial side did not work.** We shipped monetisation and it did not generate revenue. That is the thing I am now most interested in getting right.
 
 ### Matching platform for business owners and executive talent
 
