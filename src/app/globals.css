@@ -87,6 +87,34 @@ article p.summary {
   margin: 0.3rem 0 1.5rem;
 }
 
+/* 著者行は日付と同じ「メタ情報」なので、日付と同じ控えめな色と大きさにする。
+   タイトル直下に置く分、タイトルの下余白をここで引き取る。 */
+.post-title:has(+ .post-author) {
+  margin-bottom: 0.4rem;
+}
+
+/* CVの h1 は「プロフィール」なので、誰のプロフィールかを直下に示す。
+   見出しの一部として読ませたいので、著者行より濃く・大きくする。 */
+.post-title:has(+ .cv-name) {
+  margin-bottom: 0.3rem;
+}
+
+.cv-name {
+  font-size: 0.95rem;
+  color: #444;
+  margin: 0 0 1.5rem;
+}
+
+.post-author {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0 0 1.5rem;
+}
+
+.post-author a {
+  color: #666;
+}
+
 .post-body ul {
   padding-left: 1.2rem;
   margin: 0;

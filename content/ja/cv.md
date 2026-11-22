@@ -1,6 +1,6 @@
 ---
 title: "プロフィール"
-summary: "フルスタックエンジニア。スタートアップの共同創業 兼 エンジニアリングマネージャーを経て、現在はオーストラリア。"
+summary: "藤原琢巳。フルスタックエンジニア。スタートアップの共同創業 兼 エンジニアリングマネージャーを経て、現在はオーストラリア。"
 ---
 
 2026年8月 現在
@@ -259,6 +259,7 @@ Vue3化の要員としてアサインされましたが、次期開発でリニ�
 
 # リンク
 
+- [X (@FujiwaraDairy)](https://x.com/FujiwaraDairy)
 - [GitHub](https://github.com/takumifujiwaradairy)
 - [LinkedIn](https://www.linkedin.com/in/takumifujiwaradairy)
 - [takumifujiwara00work@gmail.com](mailto:takumifujiwara00work@gmail.com)

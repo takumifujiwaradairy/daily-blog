@@ -10,6 +10,8 @@ export type Post = {
   slug: string;
   title: string;
   date: string;
+  // 記事を書き直した日。frontmatter に updated があれば使う（sitemap の lastModified 用）。
+  updated?: string;
   summary: string;
   contentHtml: string;
 };
@@ -35,6 +37,7 @@ export function getAllPosts(locale: Locale): Omit<Post, "contentHtml">[] {
         slug,
         title: (data.title as string) || slug,
         date: (data.date as string) || slug,
+        updated: (data.updated as string) || undefined,
         summary: (data.summary as string) || "",
       };
     })

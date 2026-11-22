@@ -1,6 +1,6 @@
 ---
 title: "Profile"
-summary: "Full stack engineer. Co-founder and Engineering Manager of a startup, now in Australia."
+summary: "Takumi Fujiwara. Full stack engineer. Co-founder and Engineering Manager of a startup, now in Australia."
 ---
 
 As of August 2026
@@ -259,6 +259,7 @@ Apr 2017 - Mar 2021 ( Tokyo )
 
 # Links
 
+- [X (@FujiwaraDairy)](https://x.com/FujiwaraDairy)
 - [GitHub](https://github.com/takumifujiwaradairy)
 - [LinkedIn](https://www.linkedin.com/in/takumifujiwaradairy)
 - [takumifujiwara00work@gmail.com](mailto:takumifujiwara00work@gmail.com)
